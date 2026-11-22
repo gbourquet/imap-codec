@@ -244,6 +244,15 @@ pub enum MessageDataItemName<'a> {
     #[cfg(feature = "ext_condstore_qresync")]
     #[cfg_attr(docsrs, doc(cfg("ext_condstore_qresync")))]
     ModSeq,
+
+    /// The Gmail message ID, a unique 64-bit identifier of a message (`X-GM-EXT-1`).
+    ///
+    /// ```imap
+    /// X-GM-MSGID
+    /// ```
+    #[cfg(feature = "ext_gmail")]
+    #[cfg_attr(docsrs, doc(cfg("ext_gmail")))]
+    XGmMsgId,
 }
 
 /// Message data item.
@@ -385,6 +394,15 @@ pub enum MessageDataItem<'a> {
     #[cfg(feature = "ext_condstore_qresync")]
     #[cfg_attr(docsrs, doc(cfg("ext_condstore_qresync")))]
     ModSeq(NonZeroU64),
+
+    /// The Gmail message ID, a unique 64-bit identifier of a message (`X-GM-EXT-1`).
+    ///
+    /// ```imap
+    /// X-GM-MSGID
+    /// ```
+    #[cfg(feature = "ext_gmail")]
+    #[cfg_attr(docsrs, doc(cfg("ext_gmail")))]
+    XGmMsgId(u64),
 }
 
 /// A part specifier is either a part number or one of the following:

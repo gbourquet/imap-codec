@@ -16,6 +16,8 @@ use nom::{
 
 #[cfg(feature = "ext_condstore_qresync")]
 use crate::extensions::condstore_qresync::mod_sequence_value;
+#[cfg(feature = "ext_gmail")]
+use crate::extensions::gmail::x_gm_msgid;
 use crate::{
     body::body,
     core::{astring, nstring, number, nz_number},
@@ -38,7 +40,8 @@ use crate::{
 ///             "BINARY"      section-binary [partial] / ; RFC 3516
 ///             "BINARY.PEEK" section-binary [partial] / ; RFC 3516
 ///             "BINARY.SIZE" section-binary           / ; RFC 3516
-///             "MODSEQ"                                 ; RFC 7162
+///             "MODSEQ"                                 / ; RFC 7162
+///             "X-GM-MSGID"                               ; X-GM-EXT-1
 /// ```
 pub(crate) fn fetch_att(input: &[u8]) -> IMAPResult<&[u8], MessageDataItemName> {
     alt((
@@ -115,6 +118,8 @@ pub(crate) fn fetch_att(input: &[u8]) -> IMAPResult<&[u8], MessageDataItemName> 
         value(MessageDataItemName::Rfc822, tag_no_case(b"RFC822")),
         #[cfg(feature = "ext_condstore_qresync")]
         value(MessageDataItemName::ModSeq, tag_no_case(b"MODSEQ")),
+        #[cfg(feature = "ext_gmail")]
+        value(MessageDataItemName::XGmMsgId, tag_no_case(b"X-GM-MSGID")),
     ))(input)
 }
 
@@ -176,7 +181,8 @@ pub(crate) fn msg_att_dynamic(input: &[u8]) -> IMAPResult<&[u8], MessageDataItem
 ///                  "BODY" section ["<" number ">"] SP nstring /
 ///                  "UID" SP uniqueid /
 ///                  "BINARY" section-binary SP (nstring / literal8) / ; RFC 3516
-///                  "BINARY.SIZE" section-binary SP number            ; RFC 3516
+///                  "BINARY.SIZE" section-binary SP number          / ; RFC 3516
+///                  "X-GM-MSGID" SP number64                          ; X-GM-EXT-1
 /// ```
 ///
 /// Note: MUST NOT change for a message
@@ -248,6 +254,8 @@ pub(crate) fn msg_att_static(input: &[u8]) -> IMAPResult<&[u8], MessageDataItem>
             tuple((tag_no_case(b"BINARY.SIZE"), section_binary, sp, number)),
             |(_, section, _, size)| MessageDataItem::BinarySize { section, size },
         ),
+        #[cfg(feature = "ext_gmail")]
+        x_gm_msgid,
     ))(input)
 }
 

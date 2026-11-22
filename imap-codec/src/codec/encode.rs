@@ -1162,6 +1162,8 @@ impl EncodeIntoContext for MessageDataItemName<'_> {
             }
             #[cfg(feature = "ext_condstore_qresync")]
             MessageDataItemName::ModSeq => ctx.write_all(b"MODSEQ"),
+            #[cfg(feature = "ext_gmail")]
+            MessageDataItemName::XGmMsgId => ctx.write_all(b"X-GM-MSGID"),
         }
     }
 }
@@ -1778,6 +1780,8 @@ impl EncodeIntoContext for MessageDataItem<'_> {
             }
             #[cfg(feature = "ext_condstore_qresync")]
             Self::ModSeq(value) => write!(ctx, "MODSEQ {value}"),
+            #[cfg(feature = "ext_gmail")]
+            Self::XGmMsgId(value) => write!(ctx, "X-GM-MSGID {value}"),
         }
     }
 }
